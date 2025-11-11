@@ -3,11 +3,11 @@ import * as motion from "motion/react-client";
 export default function Home() {
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
+      initial={{ x: -100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
     >
-      안녕하세요! 페이드인 효과입니다.
+      왼쪽에서 슬라이드 인!
     </motion.div>
   );
 }
