@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/ThemeToggle";
 import Image from "next/image";
 
 export default function Home() {
@@ -48,6 +49,9 @@ export default function Home() {
 
   return (
     <main className="mx-auto px-4 py-8 dark:bg-gray-900">
+      <div className="mb-4 flex justify-end">
+        <ThemeToggle />
+      </div>
       <h1 className="mb-8 text-center text-4xl font-bold dark:text-white">
         나의 블로그
       </h1>
