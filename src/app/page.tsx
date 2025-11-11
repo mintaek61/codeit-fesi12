@@ -2,12 +2,12 @@ import * as motion from "motion/react-client";
 
 export default function Home() {
   return (
-    <motion.div
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
+    <motion.button
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      className="rounded-md border-none bg-blue-500 px-5 py-2.5 text-white"
     >
-      왼쪽에서 슬라이드 인!
-    </motion.div>
+      마우스를 올려보세요!
+    </motion.button>
   );
 }
