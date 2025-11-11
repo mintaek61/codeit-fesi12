@@ -1,51 +1,58 @@
 "use client";
-import * as React from "react";
-import { useScroll, useTransform, motion } from "motion/react";
 
-const PAGE_COUNT = 5;
+import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
-function ScrollLinked() {
-  // 1. 현재 스크롤 위치 추적
-  const { scrollYProgress } = useScroll();
-  // 2. 현재 스크롤 위치를 기반으로 클립 경로 계산
-  const clipPath = useTransform(
-    scrollYProgress,
-    scrollYProgress => `circle(${scrollYProgress * 100}%)`,
-  );
+export default function Home() {
+  const [items, setItems] = useState([...Array(10)].map((_, i) => i + 1));
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  // useInView 훅을 사용하여 감지
+  const { ref, inView } = useInView({
+    threshold: 1,
+  });
+
+  // inView가 true일 때 더 로드
+  useEffect(() => {
+    const loadMoreItems = async () => {
+      setIsLoading(true);
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const nextPage = page + 1;
+      const newItems = [...Array(10)].map((_, i) => items.length + i + 1);
+
+      setItems(prevItems => [...prevItems, ...newItems]);
+      setPage(nextPage);
+      setIsLoading(false);
+    };
+    if (inView) {
+      loadMoreItems();
+    }
+  }, [inView]);
 
   return (
-    <div className="h-full w-full bg-gray-900">
-      <div className="fixed inset-0">
-        <motion.div
-          // 원을 중앙에 위치시키기
-          // absolute top-1/2 left-1/2: 요소의 왼쪽 상단 모서리를 부모 요소의 중앙점에 위치
-          // -translate-x-1/2 -translate-y-1/2: 자신의 너비의 50%만큼 위, 왼쪽으로 이동
-          // 텍스트 중앙 위치
-          // flex items-center justify-center: 요소의 중앙에 텍스트 배치
-          // h-full w-full: 요소의 높이와 너비를 100%로 설정
-          // bg-orange-500: 오렌지색 배경
-          className="absolute top-1/2 left-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-orange-500"
-          style={{
-            clipPath,
-          }}
-        >
-          <div className="text-center">
-            <h1 className="flex flex-col gap-4 text-8xl font-bold text-blue-600">
-              <span>
-                <motion.span>Aha!</motion.span>
-              </span>
-              <span>
-                <motion.span>You found me!</motion.span>
-              </span>
-            </h1>
+    <div className="container mx-auto">
+      <div className="flex flex-col gap-4">
+        {items.map(item => (
+          <div className="h-48 border border-gray-500" key={item}>
+            {item}
           </div>
-        </motion.div>
+        ))}
       </div>
-      {new Array(PAGE_COUNT).fill(null).map((_, index) => (
-        <div className="h-screen w-screen" key={index} />
-      ))}
+      {/* 해당 div가 뷰포트에 다 보일 때 더 로드 */}
+      <div ref={ref} className="py-4 text-center">
+        {isLoading ? (
+          <div className="flex items-center justify-center space-x-2">
+            <div className="h-4 w-4 animate-pulse rounded-full bg-blue-500"></div>
+            <div className="h-4 w-4 animate-pulse rounded-full bg-blue-500"></div>
+            <div className="h-4 w-4 animate-pulse rounded-full bg-blue-500"></div>
+            <span className="text-gray-500">로딩 중...</span>
+          </div>
+        ) : (
+          <span className="text-gray-400">더 로드하려면 스크롤하세요</span>
+        )}
+      </div>
     </div>
   );
 }
-
-export default ScrollLinked;
