@@ -1,6 +1,7 @@
 // app/components/PageTransition/index.tsx
+"use client";
 
-import * as motion from "motion/react-client";
+import * as m from "motion/react-m";
 
 export default function PageTransition({
   children,
@@ -8,12 +9,12 @@ export default function PageTransition({
   children: React.ReactNode;
 }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,57 +1,67 @@
 "use client";
 
-import { useState } from "react";
-import StartPage from "../components/StartPage";
-import QuestionPage from "../components/QuestionPage";
-import ResultPage from "../components/ResultPage";
+import { useState, useEffect } from "react";
+import * as m from "motion/react-m";
+import { AnimatePresence } from "motion/react";
 
-const questions = [
-  {
-    question: "사람들과 함께 있을 때 에너지가 충전되나요?",
-    options: ["매우 그렇다", "약간 그렇다", "약간 아니다", "전혀 아니다"],
-  },
-  {
-    question: "새로운 아이디어를 생각하는 것을 좋아하시나요?",
-    options: ["매우 그렇다", "약간 그렇다", "약간 아니다", "전혀 아니다"],
-  },
-  {
-    question: "계획을 세우는 것을 선호하시나요?",
-    options: ["매우 그렇다", "약간 그렇다", "약간 아니다", "전혀 아니다"],
-  },
-];
+export const WordChangeAnimation = ({
+  prefix,
+  suffix,
+  words,
+  interval = 2000,
+}: {
+  prefix: string;
+  suffix: string;
+  words: string[];
+  interval?: number;
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-export default function MBTITest() {
-  // 현재 진행 단계: 0 - 시작 페이지, 1 - 질문 페이지, 2 - 결과 페이지
-  const [currentStep, setCurrentStep] = useState(0);
-  // 사용자의 답변 저장
-  const [answers, setAnswers] = useState<string[]>([]);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      // currentIndex를 현재 단어 개수로 나눈 나머지를 구함
+      // 단어가 4개라면 0, 1, 2, 3, 0, 1, 2, 3, ...
+      setCurrentIndex(prev => (prev + 1) % words.length);
+    }, interval);
 
-  // 시작 버튼 클릭 시 진행 단계 변경
-  const handleStart = () => {
-    setCurrentStep(1);
-  };
-
-  // 질문 페이지에서 답변 선택 시 호출되는 함수
-  const handleAnswer = (answer: string) => {
-    setAnswers([...answers, answer]);
-    if (answers.length + 1 === questions.length) {
-      setCurrentStep(2);
-    }
-  };
+    return () => clearInterval(timer);
+  }, [words, interval]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      {currentStep === 0 && <StartPage onStart={handleStart} />}
-      {currentStep === 1 && (
-        <QuestionPage
-          // 옵션 선택 시마다 애니메이션 적용을 위해 key 추가
-          // key가 없으면 기존 컴포넌트를 재사용하고 props만 업데이트하기 때문
-          key={answers.length}
-          question={questions[answers.length]}
-          onAnswer={handleAnswer}
-        />
-      )}
-      {currentStep === 2 && <ResultPage answers={answers} />}
+    <div className="flex h-12 items-center overflow-hidden text-2xl">
+      <span>{prefix}</span>
+      <div className="relative mx-2 inline-block w-12 overflow-hidden">
+        <AnimatePresence mode="popLayout">
+          <m.span
+            key={currentIndex}
+            className="inline-block font-bold text-blue-600"
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -30, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {`${words[currentIndex]}`}
+          </m.span>
+        </AnimatePresence>
+      </div>
+      <span>{suffix}</span>
+    </div>
+  );
+};
+
+// 사용 예시
+export default function WordChangeExample() {
+  // 단어 목록
+  const words = ["러닝", "게임", "볼링", "요가", "독서"];
+
+  return (
+    <div className="p-8">
+      <WordChangeAnimation
+        prefix="오늘은"
+        suffix="어떤가요?"
+        words={words}
+        interval={2000}
+      />
     </div>
   );
 }
