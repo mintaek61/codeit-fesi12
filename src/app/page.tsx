@@ -1,64 +1,91 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 
+type Item = {
+  id: number;
+  name: string;
+};
+
+export type CartItem = Item & {
+  count: number;
+};
+
+const ITEMS = [
+  {
+    id: 1,
+    name: "사과",
+  },
+  {
+    id: 2,
+    name: "오렌지",
+  },
+  {
+    id: 3,
+    name: "딸기",
+  },
+];
+
 export default function Home() {
-  const [fill, setFill] = useState("#000000");
-  const [border, setBorder] = useState("#000000");
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
+  const handleAddItem = (item: Item) => {
+    // 1. 중복 여부 확인
+    const isExist = cartItems.find(cartItem => cartItem.id === item.id);
+    // 2. 중복이 있다면 개수를 증가
+    if (isExist) {
+      const updatedCartItems = cartItems.map(cartItem =>
+        cartItem.id === item.id
+          ? { ...cartItem, count: cartItem.count + 1 }
+          : cartItem,
+      );
+      sessionStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+      setCartItems(updatedCartItems);
+    } else {
+      // 3. 아니라면 그냥 추가
+      const updatedCartItems = [...cartItems, { ...item, count: 1 }];
+      sessionStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
+      setCartItems(updatedCartItems);
+    }
+  };
+
+  // 세션 스토리지에서 장바구니 아이템을 가져오기 (새로고침해도 유지)
   useEffect(() => {
-    // 함수로 감싸지 않으면 set관련 코드가 린트 에러 발생
-    const initializeTheme = () => {
-      const savedFill = localStorage.getItem("theme-fill");
-      const savedBorder = localStorage.getItem("theme-border");
-
-      if (savedFill) setFill(savedFill);
-      if (savedBorder) setBorder(savedBorder);
+    const initializeCartItems = () => {
+      const cartItems = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+      setCartItems(cartItems);
     };
-    initializeTheme();
+    initializeCartItems();
   }, []);
 
-  const handleFillChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    setFill(newColor);
-    localStorage.setItem("theme-fill", newColor);
-  };
-
-  const handleBorderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    setBorder(newColor);
-    localStorage.setItem("theme-border", newColor);
-  };
-
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-6">
-      <h1 className="text-2xl font-bold">테마 설정</h1>
-      <div className="flex items-center justify-center gap-6">
-        <div className="flex h-18 w-48 items-center justify-center gap-2 rounded-md bg-gray-300">
-          <span>채우기</span>
-          <input
-            type="color"
-            name="fill"
-            id="fill"
-            value={fill}
-            onChange={e => handleFillChange(e)}
-          />
-        </div>
-        <div className="flex h-18 w-48 items-center justify-center gap-2 rounded-md bg-gray-300">
-          <span>테두리</span>
-          <input
-            type="color"
-            name="border"
-            id="border"
-            value={border}
-            onChange={e => handleBorderChange(e)}
-          />
-        </div>
+    <div className="mx-auto flex h-screen max-w-md flex-col items-center justify-center gap-4">
+      <h1 className="text-2xl font-bold">코드잇 마켓</h1>
+      <div className="flex w-full flex-col items-center justify-center gap-4">
+        {ITEMS.map(item => (
+          <div
+            key={item.id}
+            className="flex w-full items-center justify-between gap-2 rounded-md bg-gray-100 px-8 py-4"
+          >
+            <span>{item.name}</span>
+            <button
+              onClick={() => handleAddItem(item)}
+              className="cursor-pointer rounded-md bg-gray-300 px-4 py-3 hover:bg-gray-400"
+            >
+              담기
+            </button>
+          </div>
+        ))}
       </div>
-      <div
-        className={`h-24 w-48 rounded-md border-4`}
-        style={{ backgroundColor: fill, borderColor: border }}
-      ></div>
+      <div className="w-full">장바구니: {cartItems.length}개</div>
+      <Link
+        href="/cart"
+        className="w-full rounded-md bg-indigo-500 px-4 py-3 text-white"
+      >
+        장바구니로 가기
+      </Link>
     </div>
   );
 }
