@@ -31,11 +31,11 @@ export const Input = ({
   onDelete,
 }: InputProps) => {
   const [internalValue, setInternalValue] = useState(defaultValue);
-  
+
   // 제어 컴포넌트인지 비제어 컴포넌트인지 확인
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : internalValue;
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isControlled) {
       onChange?.(e);
@@ -43,7 +43,7 @@ export const Input = ({
       setInternalValue(e.target.value);
     }
   };
-  
+
   const handleDelete = () => {
     if (isControlled) {
       onDelete?.();
@@ -51,7 +51,7 @@ export const Input = ({
       setInternalValue("");
     }
   };
-  
+
   return (
     <div className="relative inline-block w-full">
       <input

@@ -2,24 +2,15 @@
 
 "use client";
 
-import { useState } from "react";
 import { Input } from "../Input";
+import { useInputs } from "@/hooks/useInputs";
 
 export const SignupForm = () => {
-  const [values, setValues] = useState({
+  const { values, handleChange, handleDelete } = useInputs({
     email: "",
     password: "",
     confirmPassword: "",
   });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleDelete = (field: keyof typeof values) => {
-    setValues(prev => ({ ...prev, [field]: "" }));
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +19,7 @@ export const SignupForm = () => {
   };
 
   return (
-    <form role="form" onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="email" className="block mb-2">
           이메일
