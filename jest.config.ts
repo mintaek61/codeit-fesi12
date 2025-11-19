@@ -12,6 +12,12 @@ const config: Config = {
   testEnvironment: "jest-fixed-jsdom",
   // 테스트 전에 실행할 설정 파일을 지정
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  // Playwright 테스트 파일을 Jest에서 제외
+  testPathIgnorePatterns: [
+    "<rootDir>/e2e/",
+    "<rootDir>/.next/",
+    "<rootDir>/node_modules/",
+  ],
   // MSW 모듈을 모킹하여 ESM 문제를 방지
   moduleNameMapper: {
     "^@/mocks$": "<rootDir>/src/__mocks__/mocks.ts",
